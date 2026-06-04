@@ -90,8 +90,8 @@ body {
 .ag-logo {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 20px 18px 22px;
+  justify-content: center;
+  padding: 18px 16px 20px;
   border-bottom: 1px solid var(--ag-sidebar-border);
   flex-shrink: 0;
   text-decoration: none;
@@ -99,33 +99,17 @@ body {
 
 .ag-logo:hover { text-decoration: none; }
 
-.ag-logo-icon {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
+.ag-logo-img {
+  width: 160px;
+  height: auto;
+  object-fit: contain;
+  /* Logo is blue on transparent — invert to white for dark sidebar */
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+  transition: opacity var(--ag-dur);
 }
 
-.ag-logo-wordmark {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-
-.ag-logo-top {
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.ag-logo-bot {
-  font-size: 14px;
-  font-weight: 300;
-  color: rgba(255,255,255,0.5);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
+.ag-logo:hover .ag-logo-img { opacity: 1; }
 
 /* Nav sections */
 .ag-nav { flex: 1; padding: 14px 0 8px; }
