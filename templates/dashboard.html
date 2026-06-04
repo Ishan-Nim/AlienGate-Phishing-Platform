@@ -1,70 +1,191 @@
 {{define "body"}}
-<div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-    <h1 class="page-header">
-        Dashboard
-    </h1>
-    <div id="loading">
-        <i class="fa fa-spinner fa-spin fa-4x"></i>
+<div class="ag-dashboard">
+
+    {{/* ── Page header card ── */}}
+    <div class="ag-page-hdr">
+        <h2>Dashboard</h2>
+        <p>Monitor phishing simulation campaigns and track engagement metrics across your infrastructure</p>
     </div>
+
     {{template "flashes" .Flashes}}
+
+    {{/* ── Loading state ── */}}
+    <div id="loading">
+        <i class="fa fa-spinner fa-spin fa-3x" style="color:var(--ag-text-muted)"></i>
+    </div>
+
+    {{/* ── Empty state ── */}}
     <div id="emptyMessage" style="display:none;">
-        <div class="alert alert-info">
-            No campaigns created yet. Let's create one!
+        <div class="ag-card ag-card-body">
+            <div class="alert alert-info">
+                <strong>No campaigns yet.</strong> Head to Campaigns to launch your first simulation.
+            </div>
         </div>
     </div>
+
+    {{/* ── Main dashboard content ── */}}
     <div id="dashboard" style="display:none;">
-        <div class="row">
-            <div id="overview_chart" style="height:200px;" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>
+
+        {{/* ── Stat cards ── */}}
+        <div class="ag-stats-row">
+
+            <div class="ag-stat">
+                <div class="ag-stat-meta">
+                    <span class="ag-stat-lbl">Total Campaigns</span>
+                    <span class="ag-stat-num" id="ag-stat-total">0</span>
+                </div>
+                <div class="ag-stat-ico ag-ico-blue">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="ag-stat">
+                <div class="ag-stat-meta">
+                    <span class="ag-stat-lbl">Active Campaigns</span>
+                    <span class="ag-stat-num" id="ag-stat-active">0</span>
+                </div>
+                <div class="ag-stat-ico ag-ico-orange">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="ag-stat">
+                <div class="ag-stat-meta">
+                    <span class="ag-stat-lbl">Emails Sent</span>
+                    <span class="ag-stat-num" id="ag-stat-sent">0</span>
+                </div>
+                <div class="ag-stat-ico ag-ico-purple">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="ag-stat">
+                <div class="ag-stat-meta">
+                    <span class="ag-stat-lbl">Credentials Captured</span>
+                    <span class="ag-stat-num" id="ag-stat-creds">0</span>
+                </div>
+                <div class="ag-stat-ico ag-ico-green">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+        </div><!-- /.ag-stats-row -->
+
+        {{/* ── Overview timeline chart ── */}}
+        <div class="ag-card">
+            <div class="ag-card-hdr">
+                <div>
+                    <h3>Campaign Overview</h3>
+                    <p>Email delivery &amp; engagement activity timeline</p>
+                </div>
+            </div>
+            <div class="ag-card-body" style="padding:16px 20px;">
+                <div id="overview_chart" style="height:190px;"></div>
+            </div>
         </div>
-        <div class="row">
-            <div style="height:200px;" class="col-lg-1 col-md-1"></div>
-            <div id="sent_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
-            <div id="opened_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
-            <div id="clicked_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
-            <div id="submitted_data_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
-            <div id="email_reported_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
-            <div style="height:200px;" class="col-lg-1 col-md-1"></div>
+
+        {{/* ── Donut charts row ── */}}
+        <div class="ag-charts-row">
+            <div class="row" style="margin:0; padding:8px 0;">
+                <div style="height:200px;" class="col-lg-1 col-md-1"></div>
+                <div id="sent_chart"           style="height:200px;" class="col-lg-2 col-md-2"></div>
+                <div id="opened_chart"         style="height:200px;" class="col-lg-2 col-md-2"></div>
+                <div id="clicked_chart"        style="height:200px;" class="col-lg-2 col-md-2"></div>
+                <div id="submitted_data_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
+                <div id="email_reported_chart" style="height:200px;" class="col-lg-2 col-md-2"></div>
+                <div style="height:200px;" class="col-lg-1 col-md-1"></div>
+            </div>
         </div>
-        <div class="row">
-            <h2>Recent Campaigns</h2>
-        </div>
-        <div class="row">
-            <a href="/campaigns">
-                <button type="button" class="btn btn-primary">View All</button>
-            </a>
-        </div>
-        &nbsp;&nbsp;
-        <div class="row">
-            <table id="campaignTable" class="table">
-                <thead>
-                    <tr>
-                        <th class="col-md-2 col-sm-2">Name</th>
-                        <th class="col-md-2 col-sm-2">Created Date</th>
-                        <th class="col-md-1 col-sm-1">
-                            <i class="fa fa-envelope-o"></i>
-                        </th>
-                        <th class="col-md-1 col-sm-1">
-                            <i class="fa fa-envelope-open-o"></i>
-                        </th>
-                        <th class="col-md-1 col-sm-1">
-                            <i class="fa fa-mouse-pointer"></i>
-                        </th>
-                        <th class="col-md-1 col-sm-1">
-                            <i class="fa fa-exclamation-circle"></i>
-                        </th>
-                        <th class="col-md-1 col-sm-1">
-                            <i class="fa fa-bullhorn"></i>
-                        </th>
-                        <th class="col-md-1 col-sm-1">Status</th>
-                        <th class="col-md-2 col-sm-2 no-sort"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-{{end}} {{define "scripts"}}
+
+        {{/* ── Recent Campaigns table ── */}}
+        <div class="ag-card">
+            <div class="ag-card-hdr">
+                <div>
+                    <h3>Recent Campaigns</h3>
+                    <p>Latest phishing simulation results</p>
+                </div>
+                <a href="/campaigns" class="ag-btn ag-btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    View All
+                </a>
+            </div>
+            <div style="padding:0;">
+                <table id="campaignTable" class="table" style="margin:0;">
+                    <thead>
+                        <tr>
+                            <th class="col-md-2 col-sm-2">Name</th>
+                            <th class="col-md-2 col-sm-2">Created Date</th>
+                            <th class="col-md-1 col-sm-1"><i class="fa fa-envelope-o" title="Sent"></i></th>
+                            <th class="col-md-1 col-sm-1"><i class="fa fa-envelope-open-o" title="Opened"></i></th>
+                            <th class="col-md-1 col-sm-1"><i class="fa fa-mouse-pointer" title="Clicked"></i></th>
+                            <th class="col-md-1 col-sm-1"><i class="fa fa-exclamation-circle" title="Submitted Data"></i></th>
+                            <th class="col-md-1 col-sm-1"><i class="fa fa-bullhorn" title="Reported"></i></th>
+                            <th class="col-md-1 col-sm-1">Status</th>
+                            <th class="col-md-2 col-sm-2 no-sort"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div><!-- /.ag-card -->
+
+    </div><!-- /#dashboard -->
+</div><!-- /.ag-dashboard -->
+{{end}}
+
+{{define "scripts"}}
 <script src="/js/dist/app/dashboard.min.js"></script>
+<script>
+// Populate stat cards by fetching campaign data
+(function () {
+    if (typeof user === 'undefined') return;
+    fetch('/api/campaigns/', {
+        headers: { 'Authorization': 'Bearer ' + user.api_key }
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (campaigns) {
+        if (!Array.isArray(campaigns)) return;
+        var total  = campaigns.length;
+        var active = 0, sent = 0, creds = 0;
+        campaigns.forEach(function (c) {
+            if (c.status === 'In progress') active++;
+            if (c.stats) {
+                sent  += (c.stats.sent            || 0);
+                creds += (c.stats.submitted_data  || 0);
+            }
+        });
+        var set = function (id, val) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = val;
+        };
+        set('ag-stat-total',  total);
+        set('ag-stat-active', active);
+        set('ag-stat-sent',   sent);
+        set('ag-stat-creds',  creds);
+    })
+    .catch(function () {});
+})();
+</script>
 {{end}}

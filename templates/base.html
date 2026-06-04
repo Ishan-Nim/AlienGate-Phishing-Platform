@@ -6,68 +6,103 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gophish - Phishing Toolkit">
-    <meta name="author" content="Jordan Wright (http://github.com/jordan-wright)">
+    <meta name="description" content="AlienGate — Phishing Simulation Platform">
     <link rel="shortcut icon" href="/images/favicon.ico">
-
-    <title>{{ .Title }} - Gophish</title>
+    <title>{{ .Title }} — AlienGate</title>
 
     <link href="/css/dist/gophish.css" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Roboto:700,500' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="/css/aliengate.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" type="text/css">
+
     <script>
         {{if .User}}
-    var user = {
-        api_key : {{ .User.ApiKey }},
-        username : {{ .User.Username }}
-    }
-    {{end}}
-    {{if .Token}}
-        var csrf_token = {{.Token}}
-    {{end}}
+        var user = {
+            api_key:  {{ .User.ApiKey }},
+            username: {{ .User.Username }}
+        };
+        {{end}}
+        {{if .Token}}
+        var csrf_token = {{.Token}};
+        {{end}}
     </script>
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="navbar-logo" src="/images/logo_inv_small.png" />
-                <a class="navbar-brand" href="/">&nbsp;gophish</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        {{if .User}}
-                        <div class="btn-group" id="navbar-dropdown">
-                            <a class="btn btn-primary" href="/settings"><i class="fa fa-user"></i> {{.User.Username}}</a>
-                            <a class="btn btn-primary dropdown-toggle" href="/logout">
-                                <i class="fa fa-sign-out"></i>
-                            </a>
-                        </div>
-                        {{else}}
-                        <a href="/login">
-                            <button type="button" class="btn btn-primary">Login</button>
-                        </a>
-                        {{end}}
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
+
+    {{/* ── Sidebar ── */}}
     {{template "nav" .}}
-    {{template "body" .}}
-    <!-- Placed at the end of the document so the pages load faster -->
+
+    {{/* ── Main wrapper ── */}}
+    <div class="ag-main-wrapper">
+
+        {{/* ── Top Bar ── */}}
+        <header class="ag-topbar">
+            <h4 class="ag-topbar-title">{{ .Title }}</h4>
+
+            <div class="ag-topbar-right">
+                <span class="ag-lang-pill">EN</span>
+
+                <div class="ag-bar-sep"></div>
+
+                <button class="ag-icon-btn" title="Toggle dark mode" onclick="document.body.classList.toggle('ag-dark')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+
+                <span class="ag-live-badge">
+                    <span class="ag-live-dot"></span>
+                    Live Monitoring
+                </span>
+
+                {{if .User}}
+                <div class="ag-bar-sep"></div>
+                <a href="/settings" class="ag-user-chip" title="Account Settings">
+                    <div class="ag-user-chip-avatar" id="ag-topbar-avatar">U</div>
+                    {{.User.Username}}
+                </a>
+                {{end}}
+            </div>
+        </header>
+
+        {{/* ── Page content ── */}}
+        <main class="ag-content">
+            {{template "body" .}}
+        </main>
+
+    </div><!-- /.ag-main-wrapper -->
+
+    {{/* ── Scripts ── */}}
     <script src="/js/dist/vendor.min.js"></script>
     <script src="/js/dist/app/gophish.min.js"></script>
     {{template "scripts" .}}
-</body>
 
+    <script>
+        // Auto-detect active nav item from current URL
+        (function () {
+            var path = window.location.pathname;
+            var links = document.querySelectorAll('.ag-nav-item');
+            links.forEach(function (link) {
+                var href = link.getAttribute('href');
+                if (!href) return;
+                var match = (href === '/') ? (path === '/') : path.startsWith(href);
+                if (match) link.classList.add('active');
+            });
+        })();
+
+        // Set user avatar initial from global user object
+        (function () {
+            if (typeof user === 'undefined' || !user.username) return;
+            var initial = user.username.charAt(0).toUpperCase();
+            var topEl = document.getElementById('ag-topbar-avatar');
+            if (topEl) topEl.textContent = initial;
+            // Also update workspace avatar if username is available
+            var wsEl = document.querySelector('.ag-ws-avatar');
+            if (wsEl && wsEl.dataset.dynamic) wsEl.textContent = initial;
+        })();
+    </script>
+
+</body>
 </html>
 {{ end }}
