@@ -9,38 +9,40 @@
 
 /* ── Design Tokens ──────────────────────────────────────── */
 :root {
-  /* Core palette */
-  --ag-bg-1:          #081028;
-  --ag-bg-2:          #0A1330;
-  --ag-border:        #343B4F;
+  /* ── Corrected dark palette ── */
+  --ag-bg-1:          #0d1117;   /* main content bg     */
+  --ag-bg-2:          #181b20;   /* sidebar / cards     */
+  --ag-bg-mid:        #121417;   /* topbar / mid-layer  */
+  --ag-border:        #2d3139;   /* subtle borders      */
+
   --ag-primary:       #3C83F6;
   --ag-accent:        #6DA2F8;
   --ag-primary-glow:  rgba(60,131,246,0.22);
   --ag-accent-hover:  #5b9df7;
 
   /* Text */
-  --ag-text:          #FFFFFF;
-  --ag-text-2:        #AEB9E1;
-  --ag-text-muted:    rgba(174,185,225,0.45);
+  --ag-text:          #e6edf3;
+  --ag-text-2:        #8b949e;
+  --ag-text-muted:    rgba(139,148,158,0.5);
 
   /* Sidebar */
-  --ag-sidebar-bg:              #0A1330;
+  --ag-sidebar-bg:              #181b20;
   --ag-sidebar-w:               230px;
-  --ag-sidebar-hover:           rgba(109,162,248,0.08);
-  --ag-sidebar-active-bg:       rgba(60,131,246,0.14);
+  --ag-sidebar-hover:           rgba(255,255,255,0.05);
+  --ag-sidebar-active-bg:       rgba(60,131,246,0.15);
   --ag-sidebar-active-border:   #3C83F6;
-  --ag-sidebar-text:            #AEB9E1;
-  --ag-sidebar-text-hover:      #FFFFFF;
+  --ag-sidebar-text:            #8b949e;
+  --ag-sidebar-text-hover:      #e6edf3;
   --ag-sidebar-text-active:     #6DA2F8;
-  --ag-sidebar-section:         rgba(174,185,225,0.32);
+  --ag-sidebar-section:         rgba(139,148,158,0.38);
 
   /* Topbar */
-  --ag-topbar-bg:     #0A1330;
+  --ag-topbar-bg:     #121417;
   --ag-topbar-h:      56px;
 
   /* Cards */
-  --ag-card-bg:       #0A1330;
-  --ag-card-shadow:   0 2px 12px rgba(0,0,0,0.35);
+  --ag-card-bg:       #181b20;
+  --ag-card-shadow:   0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.2);
 
   /* Misc */
   --ag-radius:        10px;
@@ -1045,6 +1047,29 @@ html.ag-light .swal2-title { color: #1e293b !important; }
 
 /* Light well */
 html.ag-light .well { background: #f5f7fa !important; }
+
+/* ── Dark mode explicit bg fixes ───────────────────────── */
+html:not(.ag-light) body             { background: #0d1117; }
+html:not(.ag-light) .ag-topbar      { background: #121417; }
+html:not(.ag-light) .ag-sidebar     { background: #181b20; }
+html:not(.ag-light) .ag-content     { background: #0d1117; }
+html:not(.ag-light) .ag-card        { background: #181b20; }
+html:not(.ag-light) .ag-stat        { background: #181b20; }
+html:not(.ag-light) .ag-page-hdr    { background: #181b20; }
+html:not(.ag-light) .ag-tabbar      { background: #181b20; }
+html:not(.ag-light) .ag-charts-row  { background: #181b20; }
+html:not(.ag-light) .modal-content  { background: #181b20 !important; }
+html:not(.ag-light) .modal-header   { background: #181b20 !important; }
+html:not(.ag-light) .modal-footer   { background: #121417 !important; }
+html:not(.ag-light) .dropdown-menu  { background: #181b20 !important; }
+html:not(.ag-light) .form-control   { background: #0d1117 !important; }
+html:not(.ag-light) .well           { background: #0d1117 !important; }
+html:not(.ag-light) .panel          { background: #181b20 !important; }
+html:not(.ag-light) .panel-heading  { background: #181b20 !important; }
+html:not(.ag-light) .select2-container--bootstrap .select2-selection { background: #0d1117 !important; }
+html:not(.ag-light) .select2-container--bootstrap .select2-results   { background: #181b20 !important; }
+html:not(.ag-light) ::-webkit-scrollbar-track  { background: #0d1117; }
+html:not(.ag-light) ::-webkit-scrollbar-thumb  { background: #2d3139; }
 
 /* Light btn-default */
 html.ag-light .btn-default {
