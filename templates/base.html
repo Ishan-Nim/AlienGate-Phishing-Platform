@@ -1,6 +1,6 @@
 {{ define "base" }}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="ag-html">
 
 <head>
     <meta charset="utf-8">
@@ -10,50 +10,96 @@
     <link rel="shortcut icon" href="/images/favicon.ico">
     <title>{{ .Title }} — AlienGate</title>
 
-    <link href="/css/dist/gophish.css" rel="stylesheet" type="text/css">
-    <link href="/css/aliengate.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" type="text/css">
+    <link href="/css/dist/gophish.css" rel="stylesheet">
+    <link href="/css/aliengate.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         {{if .User}}
-        var user = {
-            api_key:  {{ .User.ApiKey }},
-            username: {{ .User.Username }}
-        };
+        var user = { api_key: {{ .User.ApiKey }}, username: {{ .User.Username }} };
         {{end}}
         {{if .Token}}
         var csrf_token = {{.Token}};
         {{end}}
+
+        /* Apply saved theme & language BEFORE paint to avoid flash */
+        (function() {
+            var theme = localStorage.getItem('ag-theme') || 'dark';
+            var lang  = localStorage.getItem('ag-lang')  || 'en';
+            if (theme === 'light') document.getElementById('ag-html').classList.add('ag-light');
+            document.getElementById('ag-html').setAttribute('data-lang', lang);
+        })();
     </script>
 </head>
 
 <body>
 
-    {{/* ── Sidebar ── */}}
     {{template "nav" .}}
 
-    {{/* ── Main wrapper ── */}}
     <div class="ag-main-wrapper">
 
-        {{/* ── Top Bar ── */}}
+        <!-- ── Top Bar ── -->
         <header class="ag-topbar">
-            <h4 class="ag-topbar-title">{{ .Title }}</h4>
+            <h4 class="ag-topbar-title" id="ag-page-title">{{ .Title }}</h4>
 
             <div class="ag-topbar-right">
-                <span class="ag-lang-pill">EN</span>
+
+                <!-- Language switcher -->
+                <div class="ag-lang-wrap" id="ag-lang-wrap">
+                    <button class="ag-lang-pill" id="ag-lang-btn" onclick="agToggleLang()" title="Switch language">
+                        <span id="ag-lang-label">EN</span>
+                    </button>
+                    <div class="ag-lang-dropdown" id="ag-lang-dropdown" style="display:none;">
+                        <button class="ag-lang-dropdown-item active" data-lang="en" onclick="agSetLang('en')">
+                            <span class="ag-lang-flag">🇺🇸</span>
+                            <span class="ag-lang-name">English</span>
+                            <svg class="ag-lang-check" id="ag-check-en" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
+                        <div class="ag-lang-dropdown-sep"></div>
+                        <button class="ag-lang-dropdown-item" data-lang="ja" onclick="agSetLang('ja')">
+                            <span class="ag-lang-flag">🇯🇵</span>
+                            <span class="ag-lang-name">日本語</span>
+                            <svg class="ag-lang-check" id="ag-check-ja" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                 style="display:none;">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
 
                 <div class="ag-bar-sep"></div>
 
-                <button class="ag-icon-btn" title="Toggle dark mode" onclick="document.body.classList.toggle('ag-dark')">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                <!-- Dark / Light toggle -->
+                <button class="ag-icon-btn" id="ag-theme-btn" onclick="agToggleTheme()" title="Toggle light/dark mode">
+                    <!-- Moon icon (shown in dark mode) -->
+                    <svg id="ag-icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
+                    <!-- Sun icon (shown in light mode) -->
+                    <svg id="ag-icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         style="display:none;">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1"  x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
                 </button>
 
+                <!-- Live monitoring badge -->
                 <span class="ag-live-badge">
                     <span class="ag-live-dot"></span>
-                    Live Monitoring
+                    <span data-i18n="live_monitoring">Live Monitoring</span>
                 </span>
 
                 {{if .User}}
@@ -66,41 +112,162 @@
             </div>
         </header>
 
-        {{/* ── Page content ── */}}
         <main class="ag-content">
             {{template "body" .}}
         </main>
 
-    </div><!-- /.ag-main-wrapper -->
+    </div>
 
-    {{/* ── Scripts ── */}}
     <script src="/js/dist/vendor.min.js"></script>
     <script src="/js/dist/app/gophish.min.js"></script>
     {{template "scripts" .}}
 
     <script>
-        // Auto-detect active nav item from current URL
-        (function () {
-            var path = window.location.pathname;
-            var links = document.querySelectorAll('.ag-nav-item');
-            links.forEach(function (link) {
-                var href = link.getAttribute('href');
-                if (!href) return;
-                var match = (href === '/') ? (path === '/') : path.startsWith(href);
-                if (match) link.classList.add('active');
-            });
-        })();
+    /* ── AlienGate UI Controller ─────────────────────────── */
 
-        // Set user avatar initial from global user object
-        (function () {
-            if (typeof user === 'undefined' || !user.username) return;
-            var initial = user.username.charAt(0).toUpperCase();
-            var topEl = document.getElementById('ag-topbar-avatar');
-            if (topEl) topEl.textContent = initial;
-            // Also update workspace avatar if username is available
-            var wsEl = document.querySelector('.ag-ws-avatar');
-            if (wsEl && wsEl.dataset.dynamic) wsEl.textContent = initial;
-        })();
+    /* Translation strings */
+    var AG_I18N = {
+        en: {
+            dashboard:        'Dashboard',
+            campaigns:        'Campaigns',
+            users_groups:     'Users & Groups',
+            email_templates:  'Email Templates',
+            landing_pages:    'Landing Pages',
+            sending_profiles: 'Sending Profiles',
+            account_settings: 'Account Settings',
+            user_mgmt:        'User Management',
+            webhooks:         'Webhooks',
+            cybercrew:        'CyberCrew',
+            logout:           'Logout',
+            sec_overview:     'Overview',
+            sec_phishing:     'Phishing Ops',
+            sec_management:   'Management',
+            live_monitoring:  'Live Monitoring',
+        },
+        ja: {
+            dashboard:        'ダッシュボード',
+            campaigns:        'キャンペーン',
+            users_groups:     'ユーザーとグループ',
+            email_templates:  'メールテンプレート',
+            landing_pages:    'ランディングページ',
+            sending_profiles: '送信プロファイル',
+            account_settings: 'アカウント設定',
+            user_mgmt:        'ユーザー管理',
+            webhooks:         'ウェブフック',
+            cybercrew:        'サイバークルー',
+            logout:           'ログアウト',
+            sec_overview:     '概要',
+            sec_phishing:     'フィッシング操作',
+            sec_management:   '管理',
+            live_monitoring:  'ライブ監視',
+        }
+    };
+
+    /* Apply translations to all [data-i18n] elements */
+    function agApplyLang(lang) {
+        var strings = AG_I18N[lang] || AG_I18N['en'];
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var key = el.getAttribute('data-i18n');
+            if (strings[key]) el.textContent = strings[key];
+        });
+        /* Update lang pill label */
+        var lbl = document.getElementById('ag-lang-label');
+        if (lbl) lbl.textContent = lang === 'ja' ? 'JA' : 'EN';
+        /* Update checkmarks */
+        var cEn = document.getElementById('ag-check-en');
+        var cJa = document.getElementById('ag-check-ja');
+        if (cEn) cEn.style.display = (lang === 'en') ? '' : 'none';
+        if (cJa) cJa.style.display = (lang === 'ja') ? '' : 'none';
+        /* Active class on items */
+        document.querySelectorAll('.ag-lang-dropdown-item').forEach(function(el) {
+            el.classList.toggle('active', el.getAttribute('data-lang') === lang);
+        });
+        /* Highlight pill when non-default */
+        var pill = document.getElementById('ag-lang-btn');
+        if (pill) pill.classList.toggle('has-selection', lang === 'ja');
+        /* Update html lang attribute */
+        document.getElementById('ag-html').setAttribute('lang', lang === 'ja' ? 'ja' : 'en');
+    }
+
+    function agSetLang(lang) {
+        localStorage.setItem('ag-lang', lang);
+        agApplyLang(lang);
+        agCloseLangDropdown();
+    }
+
+    function agToggleLang() {
+        var dd = document.getElementById('ag-lang-dropdown');
+        dd.style.display = dd.style.display === 'none' ? '' : 'none';
+    }
+
+    function agCloseLangDropdown() {
+        var dd = document.getElementById('ag-lang-dropdown');
+        if (dd) dd.style.display = 'none';
+    }
+
+    /* Close dropdown when clicking outside */
+    document.addEventListener('click', function(e) {
+        var wrap = document.getElementById('ag-lang-wrap');
+        if (wrap && !wrap.contains(e.target)) agCloseLangDropdown();
+    });
+
+    /* Dark / Light mode */
+    function agToggleTheme() {
+        var html  = document.getElementById('ag-html');
+        var isLight = html.classList.contains('ag-light');
+        var moon  = document.getElementById('ag-icon-moon');
+        var sun   = document.getElementById('ag-icon-sun');
+
+        if (isLight) {
+            /* Switch to dark */
+            html.classList.remove('ag-light');
+            localStorage.setItem('ag-theme', 'dark');
+            if (moon) moon.style.display = '';
+            if (sun)  sun.style.display  = 'none';
+        } else {
+            /* Switch to light */
+            html.classList.add('ag-light');
+            localStorage.setItem('ag-theme', 'light');
+            if (moon) moon.style.display = 'none';
+            if (sun)  sun.style.display  = '';
+        }
+    }
+
+    /* On load — restore theme icon state */
+    (function() {
+        var isLight = document.getElementById('ag-html').classList.contains('ag-light');
+        var moon = document.getElementById('ag-icon-moon');
+        var sun  = document.getElementById('ag-icon-sun');
+        if (isLight) {
+            if (moon) moon.style.display = 'none';
+            if (sun)  sun.style.display  = '';
+        }
+    })();
+
+    /* Auto-detect active nav item */
+    (function() {
+        var path = window.location.pathname;
+        document.querySelectorAll('.ag-nav-item').forEach(function(link) {
+            var href = link.getAttribute('href');
+            if (!href) return;
+            var match = (href === '/') ? (path === '/') : path.startsWith(href);
+            if (match) link.classList.add('active');
+        });
+    })();
+
+    /* Set user avatar initial */
+    (function() {
+        if (typeof user === 'undefined' || !user.username) return;
+        var initial = user.username.charAt(0).toUpperCase();
+        var el = document.getElementById('ag-topbar-avatar');
+        if (el) el.textContent = initial;
+    })();
+
+    /* Apply saved language on load */
+    (function() {
+        var lang = localStorage.getItem('ag-lang') || 'en';
+        agApplyLang(lang);
+    })();
     </script>
 
 </body>
