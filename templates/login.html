@@ -6,54 +6,480 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Gophish - Open-Source Phishing Toolkit">
-    <meta name="author" content="Jordan Wright (http://github.com/jordan-wright)">
+    <meta name="description" content="AlienGate — Phishing Simulation Platform">
     <link rel="shortcut icon" href="/images/favicon.ico">
-
-    <title>Gophish - {{ .Title }}</title>
+    <title>AlienGate — Sign In</title>
 
     <link href="/css/dist/gophish.css" rel="stylesheet">
-    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300,600,700' rel='stylesheet' type='text/css'>
+    <link href="/css/aliengate.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Login page reset ─────────────────────────── */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0 !important;
+            background: #0f1422;
+            font-family: 'DM Sans', sans-serif;
+            overflow: hidden;
+        }
+
+        /* ── Layout ───────────────────────────────────── */
+        .ag-login-wrap {
+            display: flex;
+            min-height: 100vh;
+            height: 100vh;
+        }
+
+        /* ── Left panel — dark branding side ─────────── */
+        .ag-login-left {
+            width: 45%;
+            background: #1a2035;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        /* Subtle grid pattern */
+        .ag-login-left::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(59,130,246,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59,130,246,0.06) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Blue glow orb */
+        .ag-login-left::after {
+            content: "";
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59,130,246,0.18) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .ag-login-brand {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .ag-login-logo {
+            width: 200px;
+            height: auto;
+            filter: brightness(0) invert(1);
+            opacity: 0.95;
+            margin-bottom: 32px;
+            animation: ag-float 4s ease-in-out infinite;
+        }
+
+        @keyframes ag-float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+
+        .ag-login-tagline {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 40px;
+        }
+
+        /* Feature pills */
+        .ag-login-features {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .ag-login-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+
+        .ag-login-feature-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: rgba(59,130,246,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #60a5fa;
+        }
+
+        .ag-login-feature-icon svg { width: 16px; height: 16px; }
+
+        .ag-login-feature-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.3;
+        }
+
+        .ag-login-feature-text strong {
+            display: block;
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            font-size: 12.5px;
+        }
+
+        /* Bottom credit */
+        .ag-login-left-footer {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 0.04em;
+            z-index: 1;
+        }
+
+        /* ── Right panel — form side ──────────────────── */
+        .ag-login-right {
+            flex: 1;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 40px;
+            overflow-y: auto;
+        }
+
+        .ag-login-card {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .ag-login-header {
+            margin-bottom: 32px;
+        }
+
+        .ag-login-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 6px;
+            letter-spacing: -0.025em;
+        }
+
+        .ag-login-header p {
+            font-size: 14px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Form */
+        .ag-login-form { display: flex; flex-direction: column; gap: 16px; }
+
+        .ag-input-group { display: flex; flex-direction: column; gap: 6px; }
+
+        .ag-input-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            letter-spacing: 0.01em;
+        }
+
+        .ag-input-wrap {
+            position: relative;
+        }
+
+        .ag-input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            pointer-events: none;
+        }
+        .ag-input-icon svg { width: 16px; height: 16px; display: block; }
+
+        .ag-login-input {
+            width: 100%;
+            padding: 11px 14px 11px 42px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            color: #1e293b;
+            background: #ffffff;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 9px;
+            outline: none;
+            transition: border-color 0.16s, box-shadow 0.16s;
+            box-sizing: border-box;
+            -webkit-appearance: none;
+        }
+
+        .ag-login-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+
+        .ag-login-input::placeholder { color: #b0bec5; }
+
+        /* Submit button */
+        .ag-login-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 14.5px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+            color: #ffffff;
+            background: #3b82f6;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.35);
+            transition: background 0.16s, transform 0.14s, box-shadow 0.16s;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ag-login-btn svg { width: 16px; height: 16px; }
+
+        .ag-login-btn:hover {
+            background: #2563eb;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.4);
+            transform: translateY(-1px);
+        }
+
+        .ag-login-btn:active { transform: translateY(0); }
+
+        /* Flash messages */
+        .ag-login-flash {
+            margin-bottom: 16px;
+        }
+
+        .ag-login-flash .alert {
+            border-radius: 9px !important;
+            font-size: 13.5px !important;
+            font-weight: 500 !important;
+            border: none !important;
+            border-left: 3px solid !important;
+            padding: 11px 14px !important;
+        }
+
+        .ag-login-flash .alert-danger {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+            border-color: #ef4444 !important;
+        }
+
+        .ag-login-flash .alert-success {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Live monitoring chip */
+        .ag-login-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            font-size: 11.5px;
+            font-weight: 600;
+            padding: 4px 11px;
+            border-radius: 20px;
+            margin-bottom: 28px;
+            letter-spacing: 0.01em;
+        }
+
+        .ag-login-live-dot {
+            width: 6px;
+            height: 6px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: ag-pulse 2.2s ease-in-out infinite;
+        }
+
+        /* Right footer */
+        .ag-login-right-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .ag-login-left { display: none; }
+            .ag-login-right { padding: 32px 24px; }
+            html, body { overflow: auto; }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <img class="navbar-logo" src="/images/logo_inv_small.png" />
-                <a class="navbar-brand" href="/">&nbsp;gophish</a>
+<div class="ag-login-wrap">
+
+    {{/* ── Left branding panel ── */}}
+    <div class="ag-login-left">
+        <div class="ag-login-brand">
+
+            <img src="/images/aliengate-logo.png" alt="AlienGate" class="ag-login-logo">
+
+            <p class="ag-login-tagline">Phishing Simulation Platform</p>
+
+            <div class="ag-login-features">
+                <div class="ag-login-feature">
+                    <div class="ag-login-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </div>
+                    <div class="ag-login-feature-text">
+                        <strong>Campaign Management</strong>
+                        Launch targeted phishing simulations
+                    </div>
+                </div>
+                <div class="ag-login-feature">
+                    <div class="ag-login-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                            <polyline points="17 6 23 6 23 12"></polyline>
+                        </svg>
+                    </div>
+                    <div class="ag-login-feature-text">
+                        <strong>Real-time Analytics</strong>
+                        Track opens, clicks &amp; credentials
+                    </div>
+                </div>
+                <div class="ag-login-feature">
+                    <div class="ag-login-feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                    </div>
+                    <div class="ag-login-feature-text">
+                        <strong>Security Awareness</strong>
+                        Measure &amp; improve team resilience
+                    </div>
+                </div>
             </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a id="login-button" href="/login">
-                            <button type="button" class="btn btn-primary">Login</button>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+
+        </div>
+
+        <div class="ag-login-left-footer">
+            Powered by CyberCrew &nbsp;·&nbsp; AlienGate v1.0
         </div>
     </div>
-    <div class="container">
-        <form class="form-signin" action="" method="POST">
-            <img id="logo" src="/images/logo_purple.png" />
-            <h2 class="form-signin-heading">Please sign in</h2>
-            {{template "flashes" .Flashes}}
-            <input type="text" name="username" class="form-control top-input" placeholder="Username" required autofocus>
-            <input type="password" name="password" class="form-control bottom-input" placeholder="Password" autocomplete="off" required>
-            <input type="hidden" name="csrf_token" value="{{.Token}}" />
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-        </form>
-    </div>
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="/js/dist/vendor.min.js"></script>
-</body>
 
+    {{/* ── Right form panel ── */}}
+    <div class="ag-login-right">
+        <div class="ag-login-card">
+
+            <div class="ag-login-live">
+                <span class="ag-login-live-dot"></span>
+                Live Monitoring Active
+            </div>
+
+            <div class="ag-login-header">
+                <h1>Welcome back</h1>
+                <p>Sign in to your AlienGate account</p>
+            </div>
+
+            <div class="ag-login-flash">
+                {{template "flashes" .Flashes}}
+            </div>
+
+            <form class="ag-login-form" action="" method="POST">
+                <input type="hidden" name="csrf_token" value="{{.Token}}">
+
+                <div class="ag-input-group">
+                    <label class="ag-input-label" for="ag-username">Username</label>
+                    <div class="ag-input-wrap">
+                        <span class="ag-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </span>
+                        <input id="ag-username" type="text" name="username"
+                               class="ag-login-input" placeholder="Enter your username"
+                               required autofocus autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="ag-input-group">
+                    <label class="ag-input-label" for="ag-password">Password</label>
+                    <div class="ag-input-wrap">
+                        <span class="ag-input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </span>
+                        <input id="ag-password" type="password" name="password"
+                               class="ag-login-input" placeholder="Enter your password"
+                               required autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" class="ag-login-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                        <polyline points="10 17 15 12 10 7"></polyline>
+                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                    </svg>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="ag-login-right-footer">
+                AlienGate Phishing Simulation Platform &nbsp;·&nbsp; CyberCrew
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script src="/js/dist/vendor.min.js"></script>
+</body>
 </html>
 {{ end }}
